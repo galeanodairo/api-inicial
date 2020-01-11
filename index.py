@@ -13,10 +13,14 @@ class Usuarios(Resource):
         db = pymysql.connect("localhost","root","julio3017","compras")       
         cursor = db.cursor()
         cursor.execute("select * from usuarios")
-        results = cursor.fetchall()
+        result=cursor.fetchall()
+        row_headers=[x[0] for x in cursor.description]
         db.close()
+        json_data=[]
+        for res in result:
+                json_data.append(dict(zip(row_headers,res)))
+        return jsonify(json_data)
         
-        return {'Usuarios': [i[0] for i in results]}  # Se obtiene la primera columna que es UsuariosID
     def post(self):
         db = pymysql.connect("localhost","root","julio3017","compras")       
         cursor = db.cursor()
@@ -68,11 +72,23 @@ class DeleteUsuario(Resource):
         cursor.execute("delete from usuarios where id={0}".format(id_usuario))
         return {'status': 'Usuario Eliminado'}
 
-
+class Productos(Resource):
+    def get(self):
+        db = pymysql.connect("localhost","root","julio3017","compras")
+        cursor=db.cursor()
+        cursor.execute("select * from inventario19")
+        result=cursor.fetchall()
+        row_headers=[x[0] for x in cursor.description]
+        db.close()
+        json_data=[]
+        for res in result:
+                json_data.append(dict(zip(row_headers,res)))
+        return jsonify(json_data)
        
 api.add_resource(Usuarios, '/usuarios/')  # Route_1
 api.add_resource(DatosUsuario, '/usuarios/<id_usuario>')  # Route_2
 api.add_resource(UpdateUsuario, '/updateusuarios/<id_usuario>')  # Route_3
 api.add_resource(DeleteUsuario, '/deleteusuarios/<id_usuario>')  # Route_4
+api.add_resource(Productos, '/productos/')  # Route_1 de los productos
 if __name__ == '__main__':
      app.run(host='0.0.0.0', port='5000')
